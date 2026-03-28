@@ -1,0 +1,50 @@
+---
+import { getCollection } from 'astro:content'
+import Base from '../../../layouts/Base.astro'
+import ListLayoutSearch from '../../../components/react/ListLayoutSearch'
+import siteMetadata from '../../../data/siteMetadata'
+import { formatDate } from '../../../lib/utils'
+
+export async function getStaticPaths() {
+  const POSTS_PER_PAGE = 5
+  const allPosts = await getCollection('blog', ({ data }) => data.draft !== true)
+  const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE)
+
+  return Array.from({ length: totalPages }, (_, i) => ({
+    params: { page: (i + 1).toString() },
+  }))
+}
+
+const POSTS_PER_PAGE = 5
+const { page } = Astro.params
+const pageNumber = parseInt(page!)
+
+const allPosts = await getCollection('blog', ({ data }) => data.draft !== true)
+const sorted = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+
+const posts = sorted.map((p) => ({
+  slug: p.slug,
+  title: p.data.title,
+  date: p.data.date.toISOString(),
+  summary: p.data.summary,
+  tags: p.data.tags,
+  path: `blog/${p.slug}`,
+  formattedDate: formatDate(p.data.date, siteMetadata.locale),
+}))
+
+const initialDisplayPosts = posts.slice(
+  POSTS_PER_PAGE * (pageNumber - 1),
+  POSTS_PER_PAGE * pageNumber
+)
+const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE)
+---
+
+<Base title={siteMetadata.title} description={siteMetadata.description}>
+  <ListLayoutSearch
+    client:load
+    posts={posts}
+    title="All Posts"
+    initialDisplayPosts={initialDisplayPosts}
+    pagination={{ currentPage: pageNumber, totalPages, basePath: 'blog' }}
+  />
+</Base>

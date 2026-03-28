@@ -1,0 +1,46 @@
+---
+import { getCollection } from 'astro:content'
+import Base from '../../layouts/Base.astro'
+import ListLayoutSearch from '../../components/react/ListLayoutSearch'
+import siteMetadata from '../../data/siteMetadata'
+import { kebabCase, formatDate } from '../../lib/utils'
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog', ({ data }) => data.draft !== true)
+
+  const tags = new Set<string>()
+  allPosts.forEach((post) => {
+    post.data.tags.forEach((tag) => tags.add(kebabCase(tag)))
+  })
+
+  return Array.from(tags).map((tag) => ({
+    params: { tag },
+  }))
+}
+
+const { tag } = Astro.params
+
+const allPosts = await getCollection('blog', ({ data }) => data.draft !== true)
+const filteredPosts = allPosts
+  .filter((post) => post.data.tags.map((t) => kebabCase(t)).includes(tag!))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+
+const posts = filteredPosts.map((p) => ({
+  slug: p.slug,
+  title: p.data.title,
+  date: p.data.date.toISOString(),
+  summary: p.data.summary,
+  tags: p.data.tags,
+  path: `blog/${p.slug}`,
+  formattedDate: formatDate(p.data.date, siteMetadata.locale),
+}))
+
+const title = tag![0].toUpperCase() + tag!.split(' ').join('-').slice(1)
+---
+
+<Base
+  title={`${tag} - ${siteMetadata.title}`}
+  description={`${tag} tags - ${siteMetadata.author}`}
+>
+  <ListLayoutSearch client:load posts={posts} title={title} />
+</Base>

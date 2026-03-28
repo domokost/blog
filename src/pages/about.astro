@@ -1,0 +1,21 @@
+---
+import { getEntry } from 'astro:content'
+import AuthorLayout from '../layouts/AuthorLayout.astro'
+
+const author = await getEntry('authors', 'default')
+const { Content } = await author!.render()
+const { name, avatar, occupation, company, email, twitter, linkedin, github } = author!.data
+---
+
+<AuthorLayout
+  name={name}
+  avatar={avatar}
+  occupation={occupation}
+  company={company}
+  email={email}
+  twitter={twitter}
+  linkedin={linkedin}
+  github={github}
+>
+  <Content />
+</AuthorLayout>

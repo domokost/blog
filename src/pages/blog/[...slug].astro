@@ -1,0 +1,86 @@
+---
+import { getCollection, getEntry } from 'astro:content'
+import PostLayout from '../../layouts/PostLayout.astro'
+import PostSimple from '../../layouts/PostSimple.astro'
+import PageTitle from '../../components/PageTitle.astro'
+import Base from '../../layouts/Base.astro'
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => data.draft !== true)
+  const sorted = posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+
+  return sorted.map((post, index) => {
+    const prev = sorted[index + 1]
+      ? { path: `blog/${sorted[index + 1].slug}`, title: sorted[index + 1].data.title }
+      : null
+    const next = sorted[index - 1]
+      ? { path: `blog/${sorted[index - 1].slug}`, title: sorted[index - 1].data.title }
+      : null
+
+    return {
+      params: { slug: post.slug },
+      props: { post, prev, next },
+    }
+  })
+}
+
+const { post, prev, next } = Astro.props
+const { Content } = await post.render()
+
+const authorSlugs = post.data.authors || ['default']
+const authorDetails = await Promise.all(
+  authorSlugs.map(async (slug) => {
+    const author = await getEntry('authors', slug)
+    return author
+      ? {
+          name: author.data.name,
+          avatar: author.data.avatar,
+          twitter: author.data.twitter,
+        }
+      : { name: slug }
+  })
+)
+
+const layout = post.data.layout || 'PostLayout'
+const isDraft = post.data.draft === true
+---
+
+{
+  isDraft ? (
+    <Base title="Under Construction">
+      <div class="mt-24 text-center">
+        <PageTitle>
+          Under Construction <span role="img" aria-label="roadwork sign">🚧</span>
+        </PageTitle>
+      </div>
+    </Base>
+  ) : layout === 'PostSimple' ? (
+    <PostSimple
+      title={post.data.title}
+      date={post.data.date.toISOString()}
+      slug={post.slug}
+      summary={post.data.summary}
+      prev={prev}
+      next={next}
+    >
+      <Content />
+    </PostSimple>
+  ) : (
+    <PostLayout
+      title={post.data.title}
+      date={post.data.date.toISOString()}
+      tags={post.data.tags}
+      slug={post.slug}
+      filePath={`blog/${post.id}`}
+      lastmod={post.data.lastmod?.toISOString()}
+      summary={post.data.summary}
+      images={post.data.images}
+      canonicalUrl={post.data.canonicalUrl}
+      authorDetails={authorDetails}
+      prev={prev}
+      next={next}
+    >
+      <Content />
+    </PostLayout>
+  )
+}

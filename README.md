@@ -1,116 +1,92 @@
-# Customized version Tailwind Nextjs Starter Blog
+# Domokos Tar - Personal Blog
 
-[Tailwind Nextjs Starter Blog](https://github.com/timlrx/tailwind-nextjs-starter-blog/)
+Personal blog at [domokostar.net](https://domokostar.net), built with [Astro](https://astro.build/) and [Tailwind CSS](https://tailwindcss.com/).
 
-## Installation
+## Getting Started
 
 ```bash
 npm install
-```
-
-## Development
-
-First, run the development server:
-
-```bash
-npm start
-```
-
-or
-
-```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:4321](http://localhost:4321) to view the site.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+## Commands
 
-## Extend / Customize
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | Start dev server |
+| `npm run build` | Production build |
+| `npm run preview` | Preview production build |
+| `npm run lint` | ESLint with auto-fix |
+| `npm run format` | Prettier formatting |
 
-`data/siteMetadata.js` - contains most of the site related information which should be modified for a user's need.
-
-`data/authors/default.md` - default author information (required). Additional authors can be added as files in `data/authors`.
-
-`data/projectsData.js` - data used to generate styled card on the projects page.
-
-`data/headerNavLinks.js` - navigation links.
-
-`data/logo.svg` - replace with your own logo.
-
-`data/blog` - replace with your own blog posts.
-
-`public/static` - store assets such as images and favicons.
-
-`tailwind.config.js` and `css/tailwind.css` - contain the tailwind stylesheet which can be modified to change the overall look and feel of the site.
-
-`css/prism.css` - controls the styles associated with the code blocks. Feel free to customize it and use your preferred prismjs theme e.g. [prism themes](https://github.com/PrismJS/prism-themes).
-
-`components/social-icons` - to add other icons, simply copy an svg file from [Simple Icons](https://simpleicons.org/) and map them in `index.js`. Other icons use [heroicons](https://heroicons.com/).
-
-`components/MDXComponents.js` - pass your own JSX code or React component by specifying it over here. You can then call them directly in the `.mdx` or `.md` file. By default, a custom link and image component is passed.
-
-`layouts` - main templates used in pages.
-
-`pages` - pages to route to. Read the [Next.js documentation](https://nextjs.org/docs) for more information.
-
-`next.config.js` - configuration related to Next.js. You need to adapt the Content Security Policy if you want to load scripts, images etc. from other domains.
-
-## Post
-
-### Frontmatter
-
-Frontmatter follows [Hugo's standards](https://gohugo.io/content-management/front-matter/).
-
-Currently 10 fields are supported.
+## Project Structure
 
 ```
-title (required)
-date (required)
-tags (required, can be empty array)
-lastmod (optional)
-draft (optional)
-summary (optional)
-images (optional, if none provided defaults to socialBanner in siteMetadata config)
-authors (optional list which should correspond to the file names in `data/authors`. Uses `default` if none is specified)
-layout (optional list which should correspond to the file names in `data/layouts`)
-canonicalUrl (optional, canonical url for the post for SEO)
+src/
+├── content/blog/          # Blog posts (.md/.mdx)
+├── content/authors/       # Author profiles (.mdx)
+├── components/            # Astro components (zero JS)
+│   └── react/             # React islands (interactive)
+├── layouts/               # Page layouts
+├── pages/                 # File-based routing
+├── data/                  # Site metadata, nav links, projects
+├── lib/                   # Utility functions
+└── styles/                # Tailwind CSS, Prism code highlighting
+public/
+├── static/images/         # Blog images, avatars, favicons
+└── icons/                 # Social media SVG icons
 ```
 
-Here's an example of a post's frontmatter:
+## Customize
 
-```
+- `src/data/siteMetadata.ts` — Site title, description, social links, analytics, comments config
+- `src/content/authors/default.mdx` — Default author profile
+- `src/data/projectsData.ts` — Projects page data
+- `src/data/headerNavLinks.ts` — Navigation links
+- `tailwind.config.js` — Theme colors, typography, dark mode
+- `src/styles/prism.css` — Code block syntax highlighting theme
+
+## Blog Posts
+
+Create `.md` or `.mdx` files in `src/content/blog/` with YAML frontmatter:
+
+```yaml
 ---
-title: 'Introducing Tailwind Nexjs Starter Blog'
-date: '2021-01-12'
-lastmod: '2021-01-18'
-tags: ['next-js', 'tailwind', 'guide']
+title: 'Post Title'
+date: '2023-02-15'
+tags: ['tag1', 'tag2']
 draft: false
-summary: 'Looking for a performant, out of the box template, with all the best in web technology to support your blogging needs? Checkout the Tailwind Nextjs Starter Blog template.'
-images: ['/static/images/canada/mountains.jpg', '/static/images/canada/toronto.jpg']
-authors: ['default', 'sparrowhawk']
+summary: 'Short description'
+images: ['/static/images/image.jpg']
 layout: PostLayout
-canonicalUrl: https://tailwind-nextjs-starter-blog.vercel.app/blog/introducing-tailwind-nextjs-starter-blog
 ---
 ```
 
-### Compose
+**Required**: `title`, `date`, `tags`
+**Optional**: `lastmod`, `draft`, `summary`, `images`, `authors`, `layout`, `bibliography`, `canonicalUrl`
 
-Run `node ./scripts/compose.js` to bootstrap a new post.
+Images go in `public/static/images/` and are referenced as `/static/images/filename`.
 
-Follow the interactive prompt to generate a post with pre-filled front matter.
+## Tech Stack
+
+- **Astro 5** — Static site generator with islands architecture
+- **Tailwind CSS** — Utility-first styling with class-based dark mode
+- **React** — Interactive islands (theme switch, mobile nav, search, comments)
+- **MDX** — Markdown with JSX support, remark/rehype plugins (GFM, KaTeX math, Prism code highlighting)
+- **Giscus** — GitHub Discussions-based comments
 
 ## Deploy
 
-**Vercel**  
-The easiest way to deploy the template is to use the [Vercel Platform](https://vercel.com) from the creators of Next.js. Check out the [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Deployed to [Vercel](https://vercel.com) as a static site. Security headers are configured in `vercel.json`.
 
-**Netlify / GitHub Pages / Firebase etc.**  
-As the template uses `next/image` for image optimization, additional configurations have to be made to deploy on other popular static hosting websites like [Netlify](https://www.netlify.com/) or [GitHub Pages](https://pages.github.com/). An alternative image optimization provider such as Imgix, Cloudinary or Akamai has to be used. Alternatively, replace the `next/image` component with a standard `<img>` tag. See [`next/image` documentation](https://nextjs.org/docs/basic-features/image-optimization) for more details.
+## Environment Variables
 
-The API routes used in the newsletter component cannot be used in a static site export. You will need to use a form API endpoint provider and substitute the route in the newsletter component accordingly. Other hosting platforms such as Netlify also offer alternative solutions - please refer to their docs for more information.
+Optional — only needed for:
+- **Giscus comments**: `PUBLIC_GISCUS_REPO`, `PUBLIC_GISCUS_REPOSITORY_ID`, `PUBLIC_GISCUS_CATEGORY`, `PUBLIC_GISCUS_CATEGORY_ID`
+- **Newsletter**: `CONVERTKIT_API_KEY`, `CONVERTKIT_FORM_ID`
 
+## License
 
-## Licence
-
-[MIT](https://github.com/timlrx/tailwind-nextjs-starter-blog/blob/master/LICENSE) © [Timothy Lin](https://www.timrlx.com)
+[MIT](https://github.com/timlrx/tailwind-nextjs-starter-blog/blob/master/LICENSE) © [Timothy Lin](https://www.timrlx.com) (original template)
